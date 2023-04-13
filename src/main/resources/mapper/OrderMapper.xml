@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.sport_mall.mapper.OrderMapper">
+
+  <!-- 更新订单状态 -->
+  <update id="updateStatus" parameterType="Order">
+    UPDATE order_
+    <set>
+      id = #{id},
+      <if test="createDate!=null and createDate!=''">
+        createDate = #{createDate},
+      </if>
+      <if test="payDate!=null and payDate!=''">
+        payDate = #{payDate},
+      </if>
+      <if test="deliveryDate!=null and deliveryDate!=''">
+        deliveryDate = #{deliveryDate},
+      </if>
+      <if test="confirmDate!=null and confirmDate!=''">
+        confirmDate = #{confirmDate},
+      </if>
+      <if test="status!=null and status!=''">
+        status = #{status},
+      </if>
+    </set>
+    WHERE id = #{id}
+  </update>
+
+</mapper>

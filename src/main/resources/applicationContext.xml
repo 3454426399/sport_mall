@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <!-- 注解扫描-->
+    <context:annotation-config />
+    <context:component-scan base-package="cn.edu.hstc.sport_mall.service,cn.edu.hstc.sport_mall.configuration,cn.edu.hstc.sport_mall.controller.task" />
+
+    <!-- 加载配置数据库连接信息的属性文件 -->
+    <context:property-placeholder location="classpath:*.properties"/>
+    <!-- 配置数据库连接池 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <!-- 基本属性 driverClassName、url、username、password -->
+        <property name="driverClassName" value="${jdbc.driver}" />
+            <property name="url" value="${jdbc.url}" />
+            <property name="username" value="${jdbc.username}" />
+            <property name="password" value="${jdbc.password}" />
+
+            <!-- 配置初始化连接数量、最小空闲连接数、最大并发连接数 -->
+            <property name="initialSize" value="1" />
+            <property name="minIdle" value="1" />
+            <property name="maxActive" value="20" />
+
+            <!-- 配置获取连接的最长等待时间 -->
+            <property name="maxWait" value="60000" />
+
+            <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+            <property name="timeBetweenEvictionRunsMillis" value="60000" />
+
+            <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+            <property name="minEvictableIdleTimeMillis" value="300000" />
+
+            <property name="validationQuery" value="SELECT 1" />
+            <property name="testWhileIdle" value="true" />
+            <property name="testOnBorrow" value="false" />
+            <property name="testOnReturn" value="false" />
+
+            <!-- 缓存游标，会对一次查询结果进行缓存，一次查询，多次使用，提高效率 -->
+            <property name="poolPreparedStatements" value="true" />
+            <property name="maxPoolPreparedStatementPerConnectionSize"
+                      value="20" />
+    </bean>
+
+    <!-- SqlSessionFactory-->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 别名-->
+        <property name="typeAliasesPackage" value="cn.edu.hstc.sport_mall.pojo,cn.edu.hstc.sport_mall.util" />
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+
+        <!-- 配置分页插件-->
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <value>
+                            reasonable=true
+                        </value>
+                    </property>
+                </bean>
+            </array>
+        </property>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="cn.edu.hstc.sport_mall.mapper" />
+    </bean>
+
+    <!-- 事务管理器-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!-- 配置声明式事务 -->
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <!-- 方法名以ins、upd、del开头的方法 -->
+            <tx:method name="ins*" propagation="REQUIRED" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+            <tx:method name="upd*" propagation="REQUIRED" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+            <tx:method name="del*" propagation="REQUIRED" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+            <!-- 其它方法为只读事务-->
+            <tx:method name="sel*" read-only="true"/>
+            </tx:attributes>
+    </tx:advice>
+
+    <!-- aop 配置切面 -->
+    <aop:config>
+        <!-- aop，将service/impl下的所有方法配置为切点 -->
+        <aop:pointcut expression="execution(* cn.edu.hstc.sport_mall.service.impl.*.*(..))" id="txPoint" />
+        <!-- aop，把事务管理交给spring管理 -->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPoint" />
+    </aop:config>
+
+    <!-- 配置 shiro 的核心组件：securityManager -->
+        <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+            <!-- 配置缓存 -->
+            <property name="cacheManager" ref="cacheManager"/>
+            <!-- 配置域realm，用户名，密码，角色都保存在域里：实现从数据库中获取用户信息，需要我们自己创建一个类（实现Realm接口） -->
+            <property name="realm" ref="shiroRealm"/>
+        </bean>
+
+        <!-- 配置ehcache缓存bean，导入ehcache并新建配置文件 -->
+        <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+            <property name="cacheManagerConfigFile" value="classpath:ehcache.xml"></property>
+        </bean>
+
+        <!-- 配置自己域realm实现  -->
+        <bean id="shiroRealm" class="cn.edu.hstc.sport_mall.realms.ShiroRealm"></bean>
+
+    <bean id="staticFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!-- Shiro的核心安全接口,这个属性是必须的 -->
+        <property name="securityManager" ref="securityManager" />
+        <!-- 身份认证失败，则跳转到登录页面的配置 -->
+        <property name="loginUrl" value="admin_login.jsp" />
+
+        <!-- Shiro连接约束配置,即过滤链的定义 -->
+        <property name="filterChainDefinitions">
+            <value>
+                <!-- 则是有顺序的，从上到下，拦截范围必须是从小到大的 -->
+                <!--  url = 拦截规则（anon为匿名，authc为要登录后，才能访问，logout登出过滤） -->
+                /js/** = anon
+                /css/** = anon
+                /img/** = anon
+            </value>
+        </property>
+    </bean>
+
+    <bean id="adminFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!-- Shiro的核心安全接口,这个属性是必须的 -->
+        <property name="securityManager" ref="securityManager" />
+        <!-- 身份认证失败，则跳转到登录页面的配置 -->
+        <property name="loginUrl" value="admin_login.jsp" />
+
+        <!-- Shiro连接约束配置,即过滤链的定义 -->
+        <property name="filterChainDefinitions">
+            <value>
+                <!-- 则是有顺序的，从上到下，拦截范围必须是从小到大的 -->
+                <!--  url = 拦截规则（anon为匿名，authc为要登录后，才能访问，logout登出过滤） -->
+                /admin = anon
+                /admin_login.jsp = anon
+                /createGraphicsCode = anon
+                /UsernamePasswordLogin.admin = anon
+                /admin* = authc
+            </value>
+        </property>
+    </bean>
+
+    <!-- 配置shiro的一些拦截规则，id必须和web.xml中的 shiro 拦截器名一致 -->
+    <bean id="userFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!-- Shiro的核心安全接口,这个属性是必须的 -->
+        <property name="securityManager" ref="securityManager" />
+        <!-- 身份认证失败，则跳转到登录页面的配置 -->
+        <property name="loginUrl" value="/foreLoginPage" />
+
+        <!-- Shiro连接约束配置,即过滤链的定义 -->
+        <property name="filterChainDefinitions">
+            <value>
+                <!-- 则是有顺序的，从上到下，拦截范围必须是从小到大的 -->
+                <!--  url = 拦截规则（anon为匿名，authc为要登录后，才能访问，logout登出过滤） -->
+                /foreLoginPage = anon
+                /forehome = anon
+                /foreRegister* = anon
+                /UsernamePasswordLogin.user = anon
+                /MobileCheckCodeLogin = anon
+                /forgetPassword = anon
+                /foreReset* = anon
+                /forecheckLogin = anon
+                /foreproduct = anon
+                /forecategory = anon
+                /foreSendMobilCheckCode = anon
+                /foreCheckPhoneCode = anon
+                /foreExist = anon
+                /foresearch = anon
+
+                /** = authc
+            </value>
+        </property>
+    </bean>
+
+</beans>

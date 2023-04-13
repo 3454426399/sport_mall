@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.sport_mall.mapper.ReviewMapper">
+
+  <!-- 查询指定编号产品的所有评论，并按评论时间降序排序 -->
+  <resultMap id="reviewMap" type="Review">
+    <result property="uid" column="uid"></result>
+    <association property="user" select="cn.edu.hstc.sport_mall.mapper.UserMapper.selById" column="uid"></association>
+  </resultMap>
+  <select id="selByPid" parameterType="int" resultMap="reviewMap">
+    SELECT content, createDate, uid FROM review WHERE pid = #{pid} ORDER BY createDate DESC
+  </select>
+
+</mapper>

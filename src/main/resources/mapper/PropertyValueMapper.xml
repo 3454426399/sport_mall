@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.sport_mall.mapper.PropertyValueMapper">
+
+    <!-- 根据传入的产品编号，查询对应的属性值信息，并通过属性编号把属性名同步查询出来 -->
+    <resultMap id="PropertyValueMap" type="PropertyValue">
+        <result property="ptid" column="ptid"></result>
+        <association property="property" select="cn.edu.hstc.sport_mall.mapper.PropertyMapper.selGet" column="ptid"></association>
+    </resultMap>
+    <select id="selByPid" parameterType="int" resultMap="PropertyValueMap">
+        SELECT * FROM propertyvalue WHERE pid = #{pid} ORDER BY ptid
+    </select>
+
+</mapper>

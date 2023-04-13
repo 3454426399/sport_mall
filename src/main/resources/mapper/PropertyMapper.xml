@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.sport_mall.mapper.PropertyMapper">
+
+    <!-- 根据传入的产品分类编号，查询该产品分类的属性集合 -->
+    <select id="selList" parameterType="int" resultType="Property">
+        SELECT p.*
+        from category_property cp
+        inner join (select * from property order by id) p
+        on p.id = cp.ptid
+        where cp.cid = #{cid}
+    </select>
+
+    <!-- 调用存储过程，根据传入的属性名和产品编号，先往属性表中添加属性，再为产品添加该属性 -->
+    <insert id="insAdd">
+        CALL add_category_property(#{name}, #{cid})
+    </insert>
+
+</mapper>

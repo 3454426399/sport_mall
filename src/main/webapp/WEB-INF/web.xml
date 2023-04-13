@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         version="2.5">
+
+    <!-- spring的配置文件-->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:applicationContext.xml;classpath:spring-redis.xml</param-value>
+    </context-param>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+    <!-- spring mvc核心：分发servlet -->
+    <servlet>
+        <servlet-name>SpringMVC</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!-- spring mvc的配置文件 -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:springMVC.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SpringMVC</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <!--中文过滤器-->
+    <filter>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>utf-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 静态资源过滤器，全部放行 -->
+    <filter>
+        <filter-name>staticFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+        <init-param>
+            <param-name>targetFilterLifecycle</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>staticFilter</filter-name>
+        <url-pattern>/js/*</url-pattern>
+        <url-pattern>/css/*</url-pattern>
+        <url-pattern>/img/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 后台管理过滤器，拦截管理员用户的请求，进行过滤或放行处理 -->
+    <filter>
+        <filter-name>adminFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+        <init-param>
+            <param-name>targetFilterLifecycle</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>adminFilter</filter-name>
+        <url-pattern>/admin</url-pattern>
+        <url-pattern>/admin_login.jsp</url-pattern>
+        <url-pattern>/createGraphicsCode</url-pattern>
+        <url-pattern>/UsernamePasswordLogin.admin</url-pattern>
+        <url-pattern>/admin_category_list</url-pattern>
+        <url-pattern>/admin_category_add</url-pattern>
+        <url-pattern>/admin_category_edit</url-pattern>
+        <url-pattern>/admin_product_list</url-pattern>
+        <url-pattern>/admin_product_add</url-pattern>
+        <url-pattern>/admin_product_edit</url-pattern>
+        <url-pattern>/admin_product_update</url-pattern>
+        <url-pattern>/admin_property_bind</url-pattern>
+        <url-pattern>/admin_productImage_list</url-pattern>
+        <url-pattern>/admin_productImage_add</url-pattern>
+        <url-pattern>/admin_productImage_delete</url-pattern>
+        <url-pattern>/admin_property_list</url-pattern>
+        <url-pattern>/admin_property_add</url-pattern>
+        <url-pattern>/admin_property_edit</url-pattern>
+        <url-pattern>/admin_property_update</url-pattern>
+        <url-pattern>/admin_propertyValue_edit</url-pattern>
+        <url-pattern>/admin_propertyValue_update</url-pattern>
+        <url-pattern>/admin_product_property_add</url-pattern>
+        <url-pattern>/admin_user_list</url-pattern>
+        <url-pattern>/admin_order_list</url-pattern>
+        <url-pattern>/admin_order_delivery</url-pattern>
+        <url-pattern>/admin_statistics_day_list</url-pattern>
+        <url-pattern>/admin_statistics_month_list</url-pattern>
+        <url-pattern>/admin_property_delete</url-pattern>
+        <url-pattern>/admin_productproperty_delete</url-pattern>
+        <url-pattern>/admin_log_system_search</url-pattern>
+        <url-pattern>/admin_log_system_delete</url-pattern>
+        <url-pattern>/admin_logout</url-pattern>
+    </filter-mapping>
+
+    <!-- 前端用户拦截器，用户拦截前端用户的请求，决定放行还是过滤 -->
+    <filter>
+        <filter-name>userFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+        <init-param>
+            <param-name>targetFilterLifecycle</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>userFilter</filter-name>
+        <url-pattern>/foreLoginPage</url-pattern>
+        <url-pattern>/forehome</url-pattern>
+        <url-pattern>/foreRegisterPhone</url-pattern>
+        <url-pattern>/foreRegisterPassword</url-pattern>
+        <url-pattern>/foreRegister</url-pattern>
+        <url-pattern>/foreRegisterSuccess</url-pattern>
+        <url-pattern>/UsernamePasswordLogin.user</url-pattern>
+        <url-pattern>/MobileCheckCodeLogin</url-pattern>
+        <url-pattern>/forgetPassword</url-pattern>
+        <url-pattern>/foreResetPasswordPage</url-pattern>
+        <url-pattern>/foreResetPassword</url-pattern>
+        <url-pattern>/foreResetPasswordSuccess</url-pattern>
+        <url-pattern>/forelogout</url-pattern>
+        <url-pattern>/forecheckLogin</url-pattern>
+        <url-pattern>/foreproduct</url-pattern>
+        <url-pattern>/forecategory</url-pattern>
+        <url-pattern>/forebuyone</url-pattern>
+        <url-pattern>/forebuy</url-pattern>
+        <url-pattern>/foreGetCommonAddress</url-pattern>
+        <url-pattern>/foreShowCity</url-pattern>
+        <url-pattern>/foreShowCounty</url-pattern>
+        <url-pattern>/foreShowTown</url-pattern>
+        <url-pattern>/foreAddCommonAddress</url-pattern>
+        <url-pattern>/foreaddCart</url-pattern>
+        <url-pattern>/forecart</url-pattern>
+        <url-pattern>/forechangeOrderItem</url-pattern>
+        <url-pattern>/foredeleteOrderItem</url-pattern>
+        <url-pattern>/forecreateOrder</url-pattern>
+        <url-pattern>/forealipay</url-pattern>
+        <url-pattern>/forepayed</url-pattern>
+        <url-pattern>/forebought</url-pattern>
+        <url-pattern>/foreconfirmPay</url-pattern>
+        <url-pattern>/foreorderConfirmed</url-pattern>
+        <url-pattern>/foredeleteOrder</url-pattern>
+        <url-pattern>/forereview</url-pattern>
+        <url-pattern>/foredoreview</url-pattern>
+        <url-pattern>/foreSendMobilCheckCode</url-pattern>
+        <url-pattern>/foreCheckPhoneCode</url-pattern>
+        <url-pattern>/foreExist</url-pattern>
+        <url-pattern>/foresearch</url-pattern>
+    </filter-mapping>
+
+    <!-- 自定义404页面，资源不存在 -->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/404.jsp</location>
+    </error-page>
+
+    <!-- 自定义500页面，服务器内部错误 -->
+    <error-page>
+        <error-code>500</error-code>
+        <location>/500.jsp</location>
+    </error-page>
+    
+</web-app>

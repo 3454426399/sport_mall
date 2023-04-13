@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.sport_mall.mapper.StatisticsMapper">
+
+  <!-- 更新后台统计 -->
+  <update id="update" parameterType="Statistics">
+    UPDATE statistics
+    <set>
+      id = #{id},
+      <if test="visit!=null and visit!=''">
+        visit = #{visit},
+      </if>
+      <if test="sale!=null and sale!=''">
+        sale = #{sale},
+      </if>
+      <if test="income!=null and income!=''">
+        income = #{income},
+      </if>
+    </set>
+    WHERE id = #{id}
+  </update>
+
+</mapper>

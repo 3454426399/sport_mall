@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.sport_mall.mapper.OrderItemMapper">
+
+  <resultMap id="OrderItemMap" type="OrderItem">
+    <result property="pid" column="pid"></result>
+    <association property="product" select="cn.edu.hstc.sport_mall.mapper.ProductMapper.selGet" column="pid"></association>
+  </resultMap>
+
+  <resultMap id="OrderItemMap2" type="OrderItem">
+    <result property="pid" column="pid"></result>
+    <association property="product" select="cn.edu.hstc.sport_mall.mapper.ProductMapper.selGetNotIncluCategory" column="pid"></association>
+  </resultMap>
+
+  <!-- 根据传入的用户编号，查询该用户还未生成订单的订单项集合 -->
+<!--  SELECT id, pid, `number` FROM orderitem WHERE oid IS NULL AND uid = #{uid}-->
+  <select id="selListByUser" parameterType="int" resultMap="OrderItemMap">
+    SELECT id, pid, `number` FROM orderitem WHERE oid IS NULL AND uid = #{uid}
+  </select>
+
+  <!-- 根据订单项编号，查询对应的订单项信息 -->
+<!--  SELECT pid, `number` FROM orderitem WHERE id = #{oiid} LIMIT 1-->
+  <select id="selGet" parameterType="int" resultMap="OrderItemMap">
+    SELECT id, pid, `number` FROM orderitem WHERE id = #{oiid} LIMIT 1
+  </select>
+
+  <!-- 查询和订单号相关的所有订单项 -->
+  <!--  SELECT pid, `number`, uid FROM orderitem WHERE uid = #{uid} AND oid = #{oid}-->
+  <select id="selByOid" parameterType="int" resultMap="OrderItemMap">
+    SELECT pid, `number`, uid FROM orderitem WHERE uid = #{uid} AND oid = #{oid}
+  </select>
+
+  <!-- 查询和订单号相关的所有订单项，但不包含产品分类信息 -->
+  <select id="selByOidNotIncluCategory" parameterType="int" resultMap="OrderItemMap2">
+    SELECT pid, `number`, uid FROM orderitem WHERE uid = #{uid} AND oid = #{oid}
+  </select>
+
+</mapper>

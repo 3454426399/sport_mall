@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.sport_mall.mapper.AddressMapper">
+
+  <!-- 查询指定用户的常用地址 -->
+  <resultMap id="AddressMap" type="Address">
+    <result property="city_id" column="city_id"></result>
+    <association property="city" select="cn.edu.hstc.sport_mall.mapper.CityMapper.selCityById" column="city_id"></association>
+  </resultMap>
+  <select id="selAddressByUser" parameterType="int" resultMap="AddressMap">
+    SELECT city_id, detail FROM address WHERE uid = #{uid}
+  </select>
+
+</mapper>

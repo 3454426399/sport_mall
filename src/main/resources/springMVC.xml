@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
+
+    <!-- 注解扫描 -->
+    <context:annotation-config/>
+    <context:component-scan base-package="cn.edu.hstc.sport_mall.controller,cn.edu.hstc.sport_mall.interfaces.impl">
+        <context:include-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!-- 注解驱动 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <!-- 使用构造器赋值 -->
+                <constructor-arg value="UTF-8"/>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!-- 开通静态资源的访问 -->
+    <mvc:default-servlet-handler />
+
+    <!-- 视图定位 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+        <property name="prefix" value="/WEB-INF/jsp/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+
+    <!-- MultipartResovler 解析器 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 定义允许上传的最大文件大小 -->
+        <property name="maxUploadSize" value="102400000"></property>
+    </bean>
+
+    <!-- 异常解析器 -->
+    <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <!-- 当所上传文件的大小超过限定值时，跳转至error页面 -->
+                <prop key="org.springframework.web.multipart.MaxUploadSizeExceededException">/error/error</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!--    &lt;!&ndash; 配置shiro开启注解支持 &ndash;&gt;-->
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+          depends-on="lifecycleBeanPostProcessor"/>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+
+    <!-- 拦截器 -->
+    <mvc:interceptors>
+        <!-- 控制器执行完成后，返回试图前，判断用户是否登录，决定是否在前端页面导航栏上显示购物车数量 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/fore*"/>
+            <bean class="cn.edu.hstc.sport_mall.interceptor.CartInterceptor"></bean>
+        </mvc:interceptor>
+
+        <!-- 在注册、登录、重置密码、退出执行前后进行日志记录和后台统计 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/UsernamePasswordLogin.*"/>
+            <mvc:mapping path="/MobileCheckCodeLogin"/>
+            <mvc:mapping path="/wxLogin"/>
+            <mvc:mapping path="/forelogout"/>
+            <mvc:mapping path="/admin_logout"/>
+            <mvc:mapping path="/foreRegister"/>
+            <mvc:mapping path="/foreResetPassword"/>
+            <bean class="cn.edu.hstc.sport_mall.interceptor.LoggerAndStatisticsServiceInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+</beans>

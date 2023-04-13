@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.hstc.sport_mall.mapper.ProductMapper">
+
+    <!-- 根据传入的产品分类编号，查询该分类的所有商品信息 -->
+    <resultMap id="productMap" type="Product">
+        <id property="id" column="id"></id>
+        <association property="firstProductImage" select="cn.edu.hstc.sport_mall.mapper.ProductImageMapper.selByPid" column="id"></association>
+    </resultMap>
+
+    <select id="selListForAdmin" parameterType="int" resultMap="productMap">
+        SELECT id, `name`, subTitle, originalPrice, promotePrice, stock FROM product WHERE cid = #{cid} ORDER BY id DESC
+    </select>
+
+    <!-- 首页 - 根据传入的产品分类编号，查询该分类的月销量最高的5个商品信息 -->
+    <select id="selListLimitFive" parameterType="int" resultMap="productMap">
+        SELECT id, `name`, subTitle, promotePrice FROM product WHERE cid = #{cid} order by saleCount desc limit 5
+    </select>
+
+    <!-- 根据编号获取单个产品信息，同时根据该产品的分类编号，查询所属分类的信息 -->
+    <resultMap id="ProductMap" type="Product">
+        <result property="cid" column="cid"></result>
+        <association property="category" select="cn.edu.hstc.sport_mall.mapper.CategoryMapper.selGet" column="cid"></association>
+    </resultMap>
+    <select id="selGet" parameterType="int" resultMap="ProductMap">
+        SELECT id, `name`, subTitle, originalPrice, promotePrice, stock, cid, saleCount, reviewCount FROM product WHERE id = #{id} LIMIT 1
+    </select>
+
+    <!-- 数据迁移 -->
+    <select id="cp_mysql_to_es" parameterType="String" resultMap="productMap">
+        SELECT id, `name`, promotePrice, saleCount, reviewCount  FROM product WHERE id between #{start} and #{end} order by id
+    </select>
+
+    <!-- 更新编号id指定产品的信息 -->
+    <update id="update" parameterType="Product">
+        UPDATE product
+        <set>
+            id = #{id},
+            <if test="name!=null and name!=''">
+                `name` = #{name},
+            </if>
+            <if test="subTitle!=null and subTitle!=''">
+                subTitle = #{subTitle},
+            </if>
+            <if test="originalPrice!=null and originalPrice!=''">
+                originalPrice = #{originalPrice},
+            </if>
+            <if test="promotePrice!=null and promotePrice!=''">
+                promotePrice = #{promotePrice},
+            </if>
+            <if test="stock!=null and stock!=''">
+                stock = #{stock},
+            </if>
+            <if test="saleCount!=null and saleCount!=''">
+                saleCount = #{saleCount},
+            </if>
+            <if test="reviewCount!=null and reviewCount!=''">
+                reviewCount = #{reviewCount},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>
