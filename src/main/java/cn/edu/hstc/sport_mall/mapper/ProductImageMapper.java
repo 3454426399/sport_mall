@@ -13,7 +13,7 @@ public interface ProductImageMapper {
     /*
      * 根据传入的产品编号 & 图片类型查询对应的产品图片集合
      */
-    @Select("SELECT * FROM productimage WHERE pid = #{pid} AND type = #{type}")
+    @Select("SELECT * FROM productimage WHERE pid = #{pid} AND type = #{type} ORDER BY id DESC")
     List<ProductImage> selList(ProductImage productImage);
 
     /*

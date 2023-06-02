@@ -16,7 +16,7 @@ public interface UserMapper {
     /*
      * 查询用户的编号 & 用户名
      */
-    @Select("SELECT id, phone FROM `user` order by id")
+    @Select("SELECT id, phone FROM `user` order by id DESC")
     List<User> selList();
 
     /*

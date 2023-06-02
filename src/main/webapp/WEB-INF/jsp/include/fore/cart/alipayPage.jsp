@@ -21,7 +21,7 @@
 	</div>
 	
 	<div>
-		<a class="confirmPayLink" oid="${param.oid}" total="${param.total}" onclick="confirmPay()"><button class="confirmPay">确认支付</button></a>
+		<a class="confirmPayLink" oid="${param.oid}" total="${param.total}" address="${param.address}" receiver="${param.receiver}" mobile="${param.mobile}" onclick="confirmPay()"><button class="confirmPay">确认支付</button></a>
 	</div>
 
 </div>

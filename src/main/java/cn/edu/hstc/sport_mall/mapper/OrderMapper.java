@@ -41,7 +41,7 @@ public interface OrderMapper {
     /*
      * 查询所有的订单
      */
-    @Select("SELECT id, createDate, payDate, deliveryDate, confirmDate, status, uid FROM order_ where id > #{start} ORDER BY id limit #{count}")
+    @Select("SELECT id, createDate, payDate, deliveryDate, confirmDate, status, uid FROM order_ where id > #{start} ORDER BY id DESC limit #{count}")
     List<Order> selAll(@Param("start") int start, @Param("count") int count);
 
     /*

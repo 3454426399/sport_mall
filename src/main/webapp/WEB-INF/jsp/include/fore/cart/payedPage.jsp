@@ -9,9 +9,9 @@
 	</div>
 	<div class="payedAddressInfo">
 		<ul>
-			<li>收货地址：${o.address}</li>
-			<li>收获人姓名：${o.receiver}</li>
-			<li>联系方式：${o.mobile}</li>
+			<li>收货地址：${param.address}</li>
+			<li>收获人姓名：${param.receiver}</li>
+			<li>联系方式：${param.mobile}</li>
 			<li>实付款：<span class="payedInfoPrice">
 			￥<fmt:formatNumber type="number" value="${param.total}" minFractionDigits="2"/>
 			</li>

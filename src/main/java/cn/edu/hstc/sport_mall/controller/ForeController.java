@@ -616,7 +616,8 @@ public class ForeController {
 
         float total = orderService.insAdd(order, ois);    //结算并生成订单
 
-        return "forealipay?oid="+order.getId() +"&total="+total;    //到支付页面
+        return "forealipay?oid="+order.getId() +"&total="+total + "&address="+order.getAddress() +
+                "&receiver="+order.getReceiver() + "&mobile="+order.getMobile();     //到支付页面
     }
 
     /*

@@ -8,7 +8,7 @@
         <association property="property" select="cn.edu.hstc.sport_mall.mapper.PropertyMapper.selGet" column="ptid"></association>
     </resultMap>
     <select id="selByPid" parameterType="int" resultMap="PropertyValueMap">
-        SELECT * FROM propertyvalue WHERE pid = #{pid} ORDER BY ptid
+        SELECT * FROM propertyvalue WHERE pid = #{pid} ORDER BY ptid DESC
     </select>
 
 </mapper>

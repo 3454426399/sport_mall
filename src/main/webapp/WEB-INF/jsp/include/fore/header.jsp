@@ -316,6 +316,9 @@
 		<%--href="forepayed?oid=${param.oid}&total=${param.total}"--%>
 		function confirmPay(){
 			var oid = $(".confirmPayLink").attr("oid");
+			var address = $(".confirmPayLink").attr("address");
+			var receiver = $(".confirmPayLink").attr("receiver");
+			var mobile = $(".confirmPayLink").attr("mobile");
 			var total = $(".confirmPayLink").attr("total");
 			var password = $(".password").val();
 			var page = "forecheckLogin"
@@ -340,7 +343,8 @@
 								if (result != "success"){
 									alert(result);
 								}else {
-									window.location.href = "paySuccess?total=" + total;
+									window.location.href = "paySuccess?total=" + total + "&address=" + address + "&receiver=" + receiver +
+										"&mobile=" + mobile;
 								}
 							}
 						);

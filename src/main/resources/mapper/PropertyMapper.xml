@@ -9,6 +9,7 @@
         inner join (select * from property order by id) p
         on p.id = cp.ptid
         where cp.cid = #{cid}
+        order by cp.ptid desc
     </select>
 
     <!-- 调用存储过程，根据传入的属性名和产品编号，先往属性表中添加属性，再为产品添加该属性 -->

@@ -16,7 +16,7 @@ public interface CategoryMapper {
     /*
      * 根据起始位置 & 欲查询的个数，查询出当前页面的分类集合
      */
-    @Select("SELECT * FROM category ORDER BY id")
+    @Select("SELECT * FROM category ORDER BY id DESC")
     List<Category> selList();
 
     /*
